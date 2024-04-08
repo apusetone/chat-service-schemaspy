@@ -1,0 +1,450 @@
+<?xml version="1.0" encoding="UTF-8"?><database name="chat_service" schema="public" type="PostgreSQL - 16.2">
+   <sequences>
+      <sequence increment="1" name="chats_id_seq" startValue="1"/>
+      <sequence increment="1" name="messages_id_seq" startValue="1"/>
+      <sequence increment="1" name="sessions_id_seq" startValue="1"/>
+      <sequence increment="1" name="users_id_seq" startValue="1"/>
+   </sequences>
+   <tables>
+      <table name="alembic_version" remarks="" schema="public" type="TABLE">
+         <column autoUpdated="false" defaultValue="null" digits="0" id="0" name="version_num" nullable="false" remarks="" size="32" type="varchar" typeCode="12"/>
+         <primaryKey column="version_num" sequenceNumberInPK="1"/>
+         <index name="alembic_version_pkc" unique="true">
+            <column ascending="true" name="version_num"/>
+         </index>
+      </table>
+      <table name="chat_participants" remarks="" schema="public" type="TABLE">
+         <column autoUpdated="false" defaultValue="null" digits="0" id="0" name="chat_id" nullable="false" remarks="" size="10" type="int4" typeCode="4">
+            <parent column="id" foreignKey="fk_chat_participants_chat_id_chats" implied="false" onDeleteCascade="true" schema="public" table="chats"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="user_id" nullable="false" remarks="" size="10" type="int4" typeCode="4">
+            <parent column="id" foreignKey="fk_chat_participants_user_id_users" implied="false" onDeleteCascade="false" schema="public" table="users"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="2" name="created_at" nullable="true" remarks="" size="29" type="timestamp" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="3" name="updated_at" nullable="true" remarks="" size="29" type="timestamp" typeCode="93"/>
+         <primaryKey column="chat_id" sequenceNumberInPK="1"/>
+         <primaryKey column="user_id" sequenceNumberInPK="2"/>
+         <index name="pk_chat_participants" unique="true">
+            <column ascending="true" name="chat_id"/>
+            <column ascending="true" name="user_id"/>
+         </index>
+      </table>
+      <table name="chats" remarks="" schema="public" type="TABLE">
+         <column autoUpdated="true" defaultValue="nextval('chats_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial" typeCode="4">
+            <child column="chat_id" foreignKey="fk_chat_participants_chat_id_chats" implied="false" onDeleteCascade="true" schema="public" table="chat_participants"/>
+            <child column="chat_id" foreignKey="fk_messages_chat_id_chats" implied="false" onDeleteCascade="false" schema="public" table="messages"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="created_by" nullable="false" remarks="" size="10" type="int4" typeCode="4">
+            <parent column="id" foreignKey="fk_chats_created_by_users" implied="false" onDeleteCascade="false" schema="public" table="users"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="2" name="chat_type" nullable="false" remarks="" size="10" type="int4" typeCode="4"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="3" name="name" nullable="false" remarks="" size="255" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="4" name="created_at" nullable="true" remarks="" size="29" type="timestamp" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="5" name="updated_at" nullable="true" remarks="" size="29" type="timestamp" typeCode="93"/>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="pk_chats" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="ix_chats_created_at" unique="false">
+            <column ascending="true" name="created_at"/>
+         </index>
+         <index name="ix_chats_created_by" unique="false">
+            <column ascending="true" name="created_by"/>
+         </index>
+         <index name="ix_chats_name" unique="false">
+            <column ascending="true" name="name"/>
+         </index>
+         <index name="ix_chats_updated_at" unique="false">
+            <column ascending="true" name="updated_at"/>
+         </index>
+      </table>
+      <table name="messages" remarks="" schema="public" type="TABLE">
+         <column autoUpdated="true" defaultValue="nextval('messages_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial" typeCode="4"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="chat_id" nullable="false" remarks="" size="10" type="int4" typeCode="4">
+            <parent column="id" foreignKey="fk_messages_chat_id_chats" implied="false" onDeleteCascade="false" schema="public" table="chats"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="2" name="sender_id" nullable="false" remarks="" size="10" type="int4" typeCode="4">
+            <parent column="id" foreignKey="fk_messages_sender_id_users" implied="false" onDeleteCascade="false" schema="public" table="users"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="3" name="content" nullable="false" remarks="" size="1024" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="'{}'::integer[]" digits="0" id="4" name="read_by_list" nullable="true" remarks="" size="10" type="_int4" typeCode="2003"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="5" name="created_at" nullable="true" remarks="" size="29" type="timestamp" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="6" name="updated_at" nullable="true" remarks="" size="29" type="timestamp" typeCode="93"/>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="pk_messages" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="ix_messages_content" unique="false">
+            <column ascending="true" name="content"/>
+         </index>
+         <index name="ix_messages_created_at" unique="false">
+            <column ascending="true" name="created_at"/>
+         </index>
+         <index name="ix_messages_sender_id" unique="false">
+            <column ascending="true" name="sender_id"/>
+         </index>
+      </table>
+      <table name="sessions" remarks="" schema="public" type="TABLE">
+         <column autoUpdated="true" defaultValue="nextval('sessions_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial" typeCode="4"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="user_id" nullable="false" remarks="" size="10" type="int4" typeCode="4">
+            <parent column="id" foreignKey="fk_sessions_user_id_users" implied="false" onDeleteCascade="false" schema="public" table="users"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="2" name="device_token" nullable="true" remarks="" size="2147483647" type="bytea" typeCode="-2"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="3" name="platform_type" nullable="true" remarks="" size="10" type="int4" typeCode="4"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="4" name="refresh_token" nullable="false" remarks="" size="2147483647" type="bytea" typeCode="-2"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="5" name="refresh_token_expired_at" nullable="false" remarks="" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="6" name="created_at" nullable="true" remarks="" size="29" type="timestamp" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="7" name="updated_at" nullable="true" remarks="" size="29" type="timestamp" typeCode="93"/>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="pk_sessions" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="ix_sessions_id" unique="false">
+            <column ascending="true" name="id"/>
+         </index>
+      </table>
+      <table name="users" remarks="" schema="public" type="TABLE">
+         <column autoUpdated="true" defaultValue="nextval('users_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial" typeCode="4">
+            <child column="user_id" foreignKey="fk_chat_participants_user_id_users" implied="false" onDeleteCascade="false" schema="public" table="chat_participants"/>
+            <child column="created_by" foreignKey="fk_chats_created_by_users" implied="false" onDeleteCascade="false" schema="public" table="chats"/>
+            <child column="sender_id" foreignKey="fk_messages_sender_id_users" implied="false" onDeleteCascade="false" schema="public" table="messages"/>
+            <child column="user_id" foreignKey="fk_sessions_user_id_users" implied="false" onDeleteCascade="false" schema="public" table="sessions"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="username" nullable="true" remarks="" size="32" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="2" name="email" nullable="false" remarks="" size="255" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="3" name="new_email" nullable="true" remarks="" size="255" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="4" name="notification_type" nullable="false" remarks="" size="10" type="int4" typeCode="4"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="5" name="first_name" nullable="true" remarks="" size="30" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="6" name="last_name" nullable="true" remarks="" size="30" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="7" name="is_name_visible" nullable="false" remarks="" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="8" name="deleted_at" nullable="true" remarks="" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="9" name="created_at" nullable="true" remarks="" size="29" type="timestamp" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="10" name="updated_at" nullable="true" remarks="" size="29" type="timestamp" typeCode="93"/>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="pk_users" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="ix_users_first_name" unique="false">
+            <column ascending="true" name="first_name"/>
+         </index>
+         <index name="ix_users_last_name" unique="false">
+            <column ascending="true" name="last_name"/>
+         </index>
+         <index name="ix_users_username" unique="false">
+            <column ascending="true" name="username"/>
+         </index>
+         <index name="uq_users_email" unique="true">
+            <column ascending="true" name="email"/>
+         </index>
+         <index name="uq_users_username" unique="true">
+            <column ascending="true" name="username"/>
+         </index>
+      </table>
+   </tables>
+   <routines>
+      <routine dataAccess="MODIFIES" deterministic="true" name="armor(bytea)" returnType="text" securityType="INVOKER" type="FUNCTION">
+         <comment/>
+         <definition language="c"><![CDATA[pg_armor]]></definition>
+         <parameters>
+            <parameter mode="IN" type="bytea"/>
+         </parameters>
+      </routine>
+      <routine dataAccess="MODIFIES" deterministic="true" name="armor(bytea, text[], text[])" returnType="text" securityType="INVOKER" type="FUNCTION">
+         <comment/>
+         <definition language="c"><![CDATA[pg_armor]]></definition>
+         <parameters>
+            <parameter mode="IN" type="bytea"/>
+            <parameter mode="IN" type="text[]"/>
+            <parameter mode="IN" type="text[]"/>
+         </parameters>
+      </routine>
+      <routine dataAccess="MODIFIES" deterministic="true" name="crypt(text, text)" returnType="text" securityType="INVOKER" type="FUNCTION">
+         <comment/>
+         <definition language="c"><![CDATA[pg_crypt]]></definition>
+         <parameters>
+            <parameter mode="IN" type="text"/>
+            <parameter mode="IN" type="text"/>
+         </parameters>
+      </routine>
+      <routine dataAccess="MODIFIES" deterministic="true" name="dearmor(text)" returnType="bytea" securityType="INVOKER" type="FUNCTION">
+         <comment/>
+         <definition language="c"><![CDATA[pg_dearmor]]></definition>
+         <parameters>
+            <parameter mode="IN" type="text"/>
+         </parameters>
+      </routine>
+      <routine dataAccess="MODIFIES" deterministic="true" name="decrypt(bytea, bytea, text)" returnType="bytea" securityType="INVOKER" type="FUNCTION">
+         <comment/>
+         <definition language="c"><![CDATA[pg_decrypt]]></definition>
+         <parameters>
+            <parameter mode="IN" type="bytea"/>
+            <parameter mode="IN" type="bytea"/>
+            <parameter mode="IN" type="text"/>
+         </parameters>
+      </routine>
+      <routine dataAccess="MODIFIES" deterministic="true" name="decrypt_iv(bytea, bytea, bytea, text)" returnType="bytea" securityType="INVOKER" type="FUNCTION">
+         <comment/>
+         <definition language="c"><![CDATA[pg_decrypt_iv]]></definition>
+         <parameters>
+            <parameter mode="IN" type="bytea"/>
+            <parameter mode="IN" type="bytea"/>
+            <parameter mode="IN" type="bytea"/>
+            <parameter mode="IN" type="text"/>
+         </parameters>
+      </routine>
+      <routine dataAccess="MODIFIES" deterministic="true" name="digest(bytea, text)" returnType="bytea" securityType="INVOKER" type="FUNCTION">
+         <comment/>
+         <definition language="c"><![CDATA[pg_digest]]></definition>
+         <parameters>
+            <parameter mode="IN" type="bytea"/>
+            <parameter mode="IN" type="text"/>
+         </parameters>
+      </routine>
+      <routine dataAccess="MODIFIES" deterministic="true" name="digest(text, text)" returnType="bytea" securityType="INVOKER" type="FUNCTION">
+         <comment/>
+         <definition language="c"><![CDATA[pg_digest]]></definition>
+         <parameters>
+            <parameter mode="IN" type="text"/>
+            <parameter mode="IN" type="text"/>
+         </parameters>
+      </routine>
+      <routine dataAccess="MODIFIES" deterministic="true" name="encrypt(bytea, bytea, text)" returnType="bytea" securityType="INVOKER" type="FUNCTION">
+         <comment/>
+         <definition language="c"><![CDATA[pg_encrypt]]></definition>
+         <parameters>
+            <parameter mode="IN" type="bytea"/>
+            <parameter mode="IN" type="bytea"/>
+            <parameter mode="IN" type="text"/>
+         </parameters>
+      </routine>
+      <routine dataAccess="MODIFIES" deterministic="true" name="encrypt_iv(bytea, bytea, bytea, text)" returnType="bytea" securityType="INVOKER" type="FUNCTION">
+         <comment/>
+         <definition language="c"><![CDATA[pg_encrypt_iv]]></definition>
+         <parameters>
+            <parameter mode="IN" type="bytea"/>
+            <parameter mode="IN" type="bytea"/>
+            <parameter mode="IN" type="bytea"/>
+            <parameter mode="IN" type="text"/>
+         </parameters>
+      </routine>
+      <routine dataAccess="MODIFIES" deterministic="false" name="gen_random_bytes(integer)" returnType="bytea" securityType="INVOKER" type="FUNCTION">
+         <comment/>
+         <definition language="c"><![CDATA[pg_random_bytes]]></definition>
+         <parameters>
+            <parameter mode="IN" type="integer"/>
+         </parameters>
+      </routine>
+      <routine dataAccess="MODIFIES" deterministic="false" name="gen_random_uuid()" returnType="uuid" securityType="INVOKER" type="FUNCTION">
+         <comment/>
+         <definition language="c"><![CDATA[pg_random_uuid]]></definition>
+         <parameters>
+            <parameter mode="IN"/>
+         </parameters>
+      </routine>
+      <routine dataAccess="MODIFIES" deterministic="false" name="gen_salt(text)" returnType="text" securityType="INVOKER" type="FUNCTION">
+         <comment/>
+         <definition language="c"><![CDATA[pg_gen_salt]]></definition>
+         <parameters>
+            <parameter mode="IN" type="text"/>
+         </parameters>
+      </routine>
+      <routine dataAccess="MODIFIES" deterministic="false" name="gen_salt(text, integer)" returnType="text" securityType="INVOKER" type="FUNCTION">
+         <comment/>
+         <definition language="c"><![CDATA[pg_gen_salt_rounds]]></definition>
+         <parameters>
+            <parameter mode="IN" type="text"/>
+            <parameter mode="IN" type="integer"/>
+         </parameters>
+      </routine>
+      <routine dataAccess="MODIFIES" deterministic="true" name="hmac(bytea, bytea, text)" returnType="bytea" securityType="INVOKER" type="FUNCTION">
+         <comment/>
+         <definition language="c"><![CDATA[pg_hmac]]></definition>
+         <parameters>
+            <parameter mode="IN" type="bytea"/>
+            <parameter mode="IN" type="bytea"/>
+            <parameter mode="IN" type="text"/>
+         </parameters>
+      </routine>
+      <routine dataAccess="MODIFIES" deterministic="true" name="hmac(text, text, text)" returnType="bytea" securityType="INVOKER" type="FUNCTION">
+         <comment/>
+         <definition language="c"><![CDATA[pg_hmac]]></definition>
+         <parameters>
+            <parameter mode="IN" type="text"/>
+            <parameter mode="IN" type="text"/>
+            <parameter mode="IN" type="text"/>
+         </parameters>
+      </routine>
+      <routine dataAccess="MODIFIES" deterministic="true" name="pgp_armor_headers(text, OUT key text, OUT value text)" returnType="SETOF record" securityType="INVOKER" type="FUNCTION">
+         <comment/>
+         <definition language="c"><![CDATA[pgp_armor_headers]]></definition>
+         <parameters>
+            <parameter mode="IN" type="text"/>
+            <parameter mode="OUT" name="key" type="text"/>
+            <parameter mode="OUT" name="value" type="text"/>
+         </parameters>
+      </routine>
+      <routine dataAccess="MODIFIES" deterministic="true" name="pgp_key_id(bytea)" returnType="text" securityType="INVOKER" type="FUNCTION">
+         <comment/>
+         <definition language="c"><![CDATA[pgp_key_id_w]]></definition>
+         <parameters>
+            <parameter mode="IN" type="bytea"/>
+         </parameters>
+      </routine>
+      <routine dataAccess="MODIFIES" deterministic="true" name="pgp_pub_decrypt(bytea, bytea)" returnType="text" securityType="INVOKER" type="FUNCTION">
+         <comment/>
+         <definition language="c"><![CDATA[pgp_pub_decrypt_text]]></definition>
+         <parameters>
+            <parameter mode="IN" type="bytea"/>
+            <parameter mode="IN" type="bytea"/>
+         </parameters>
+      </routine>
+      <routine dataAccess="MODIFIES" deterministic="true" name="pgp_pub_decrypt(bytea, bytea, text)" returnType="text" securityType="INVOKER" type="FUNCTION">
+         <comment/>
+         <definition language="c"><![CDATA[pgp_pub_decrypt_text]]></definition>
+         <parameters>
+            <parameter mode="IN" type="bytea"/>
+            <parameter mode="IN" type="bytea"/>
+            <parameter mode="IN" type="text"/>
+         </parameters>
+      </routine>
+      <routine dataAccess="MODIFIES" deterministic="true" name="pgp_pub_decrypt(bytea, bytea, text, text)" returnType="text" securityType="INVOKER" type="FUNCTION">
+         <comment/>
+         <definition language="c"><![CDATA[pgp_pub_decrypt_text]]></definition>
+         <parameters>
+            <parameter mode="IN" type="bytea"/>
+            <parameter mode="IN" type="bytea"/>
+            <parameter mode="IN" type="text"/>
+            <parameter mode="IN" type="text"/>
+         </parameters>
+      </routine>
+      <routine dataAccess="MODIFIES" deterministic="true" name="pgp_pub_decrypt_bytea(bytea, bytea)" returnType="bytea" securityType="INVOKER" type="FUNCTION">
+         <comment/>
+         <definition language="c"><![CDATA[pgp_pub_decrypt_bytea]]></definition>
+         <parameters>
+            <parameter mode="IN" type="bytea"/>
+            <parameter mode="IN" type="bytea"/>
+         </parameters>
+      </routine>
+      <routine dataAccess="MODIFIES" deterministic="true" name="pgp_pub_decrypt_bytea(bytea, bytea, text)" returnType="bytea" securityType="INVOKER" type="FUNCTION">
+         <comment/>
+         <definition language="c"><![CDATA[pgp_pub_decrypt_bytea]]></definition>
+         <parameters>
+            <parameter mode="IN" type="bytea"/>
+            <parameter mode="IN" type="bytea"/>
+            <parameter mode="IN" type="text"/>
+         </parameters>
+      </routine>
+      <routine dataAccess="MODIFIES" deterministic="true" name="pgp_pub_decrypt_bytea(bytea, bytea, text, text)" returnType="bytea" securityType="INVOKER" type="FUNCTION">
+         <comment/>
+         <definition language="c"><![CDATA[pgp_pub_decrypt_bytea]]></definition>
+         <parameters>
+            <parameter mode="IN" type="bytea"/>
+            <parameter mode="IN" type="bytea"/>
+            <parameter mode="IN" type="text"/>
+            <parameter mode="IN" type="text"/>
+         </parameters>
+      </routine>
+      <routine dataAccess="MODIFIES" deterministic="false" name="pgp_pub_encrypt(text, bytea)" returnType="bytea" securityType="INVOKER" type="FUNCTION">
+         <comment/>
+         <definition language="c"><![CDATA[pgp_pub_encrypt_text]]></definition>
+         <parameters>
+            <parameter mode="IN" type="text"/>
+            <parameter mode="IN" type="bytea"/>
+         </parameters>
+      </routine>
+      <routine dataAccess="MODIFIES" deterministic="false" name="pgp_pub_encrypt(text, bytea, text)" returnType="bytea" securityType="INVOKER" type="FUNCTION">
+         <comment/>
+         <definition language="c"><![CDATA[pgp_pub_encrypt_text]]></definition>
+         <parameters>
+            <parameter mode="IN" type="text"/>
+            <parameter mode="IN" type="bytea"/>
+            <parameter mode="IN" type="text"/>
+         </parameters>
+      </routine>
+      <routine dataAccess="MODIFIES" deterministic="false" name="pgp_pub_encrypt_bytea(bytea, bytea)" returnType="bytea" securityType="INVOKER" type="FUNCTION">
+         <comment/>
+         <definition language="c"><![CDATA[pgp_pub_encrypt_bytea]]></definition>
+         <parameters>
+            <parameter mode="IN" type="bytea"/>
+            <parameter mode="IN" type="bytea"/>
+         </parameters>
+      </routine>
+      <routine dataAccess="MODIFIES" deterministic="false" name="pgp_pub_encrypt_bytea(bytea, bytea, text)" returnType="bytea" securityType="INVOKER" type="FUNCTION">
+         <comment/>
+         <definition language="c"><![CDATA[pgp_pub_encrypt_bytea]]></definition>
+         <parameters>
+            <parameter mode="IN" type="bytea"/>
+            <parameter mode="IN" type="bytea"/>
+            <parameter mode="IN" type="text"/>
+         </parameters>
+      </routine>
+      <routine dataAccess="MODIFIES" deterministic="true" name="pgp_sym_decrypt(bytea, text)" returnType="text" securityType="INVOKER" type="FUNCTION">
+         <comment/>
+         <definition language="c"><![CDATA[pgp_sym_decrypt_text]]></definition>
+         <parameters>
+            <parameter mode="IN" type="bytea"/>
+            <parameter mode="IN" type="text"/>
+         </parameters>
+      </routine>
+      <routine dataAccess="MODIFIES" deterministic="true" name="pgp_sym_decrypt(bytea, text, text)" returnType="text" securityType="INVOKER" type="FUNCTION">
+         <comment/>
+         <definition language="c"><![CDATA[pgp_sym_decrypt_text]]></definition>
+         <parameters>
+            <parameter mode="IN" type="bytea"/>
+            <parameter mode="IN" type="text"/>
+            <parameter mode="IN" type="text"/>
+         </parameters>
+      </routine>
+      <routine dataAccess="MODIFIES" deterministic="true" name="pgp_sym_decrypt_bytea(bytea, text)" returnType="bytea" securityType="INVOKER" type="FUNCTION">
+         <comment/>
+         <definition language="c"><![CDATA[pgp_sym_decrypt_bytea]]></definition>
+         <parameters>
+            <parameter mode="IN" type="bytea"/>
+            <parameter mode="IN" type="text"/>
+         </parameters>
+      </routine>
+      <routine dataAccess="MODIFIES" deterministic="true" name="pgp_sym_decrypt_bytea(bytea, text, text)" returnType="bytea" securityType="INVOKER" type="FUNCTION">
+         <comment/>
+         <definition language="c"><![CDATA[pgp_sym_decrypt_bytea]]></definition>
+         <parameters>
+            <parameter mode="IN" type="bytea"/>
+            <parameter mode="IN" type="text"/>
+            <parameter mode="IN" type="text"/>
+         </parameters>
+      </routine>
+      <routine dataAccess="MODIFIES" deterministic="false" name="pgp_sym_encrypt(text, text)" returnType="bytea" securityType="INVOKER" type="FUNCTION">
+         <comment/>
+         <definition language="c"><![CDATA[pgp_sym_encrypt_text]]></definition>
+         <parameters>
+            <parameter mode="IN" type="text"/>
+            <parameter mode="IN" type="text"/>
+         </parameters>
+      </routine>
+      <routine dataAccess="MODIFIES" deterministic="false" name="pgp_sym_encrypt(text, text, text)" returnType="bytea" securityType="INVOKER" type="FUNCTION">
+         <comment/>
+         <definition language="c"><![CDATA[pgp_sym_encrypt_text]]></definition>
+         <parameters>
+            <parameter mode="IN" type="text"/>
+            <parameter mode="IN" type="text"/>
+            <parameter mode="IN" type="text"/>
+         </parameters>
+      </routine>
+      <routine dataAccess="MODIFIES" deterministic="false" name="pgp_sym_encrypt_bytea(bytea, text)" returnType="bytea" securityType="INVOKER" type="FUNCTION">
+         <comment/>
+         <definition language="c"><![CDATA[pgp_sym_encrypt_bytea]]></definition>
+         <parameters>
+            <parameter mode="IN" type="bytea"/>
+            <parameter mode="IN" type="text"/>
+         </parameters>
+      </routine>
+      <routine dataAccess="MODIFIES" deterministic="false" name="pgp_sym_encrypt_bytea(bytea, text, text)" returnType="bytea" securityType="INVOKER" type="FUNCTION">
+         <comment/>
+         <definition language="c"><![CDATA[pgp_sym_encrypt_bytea]]></definition>
+         <parameters>
+            <parameter mode="IN" type="bytea"/>
+            <parameter mode="IN" type="text"/>
+            <parameter mode="IN" type="text"/>
+         </parameters>
+      </routine>
+   </routines>
+</database>

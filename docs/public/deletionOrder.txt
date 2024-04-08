@@ -1,0 +1,6 @@
+alembic_version
+messages
+chat_participants
+sessions
+chats
+users
