@@ -1,5 +1,5 @@
-date=2024-04-08 12:37:56+0000
-os=Linux 6.6.16-linuxkit
+date=2024-05-21 11:34:30+0000
+os=Linux 6.6.26-linuxkit
 schemaspy-version=6.2.4
 schemaspy-build=6.2.4.41 2023-07-21 11:15:12
 renderer=Graphviz dot 2.47.1 
